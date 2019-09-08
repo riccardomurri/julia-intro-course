@@ -480,6 +480,19 @@ RGB{N0f8}(0.0,0.0,0.0)
   \end{seealso}
 \end{frame}
 
+
+\begin{frame}[fragile]
+  \frametitle{The `\texttt{const}' keyword}
+  Outside of functions, variables can be marked as being
+  \emph{constant}: any redefinition or assignment of a different value
+  to a `\texttt{const}' variable is rejected with an error:
+  \begin{lstlisting}
+~\julia~ const FORTYTWO = 42;
+
+~\julia~ FORTYTWO = 42.0
+~\ERROR{invalid redefinition of constant FORTYTWO}~
+  \end{lstlisting}
+\end{frame}
 \end{document}
 
 %%% Local Variables:

@@ -1,0 +1,488 @@
+\documentclass[english,serif,mathserif,xcolor=pdftex,dvipsnames,table]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+  \newcommand\textepsilon{$\varepsilon$}% for the 'ε' char below
+  \newcommand\textpi{$\pi$}% for the 'π' char below
+
+\usetheme[informal]{s3it}
+\usepackage{s3it}
+
+\title[1. Basics]{%
+  A Short and Incomplete Introduction to Julia
+}
+\subtitle{\bfseries Part 1: Values and types}
+\author[R.~Murri]{%
+  \textbf{Riccardo Murri} \texttt{<riccardo.murri@uzh.ch>}
+  \\
+  S3IT: Services and Support for Science IT,
+  \\
+  University of Zurich
+}
+\date{September 12, 2019}
+
+
+\begin{document}
+
+% title frame
+\maketitle
+
+
+\begin{frame}
+  \frametitle{Expressions}
+  A Julia program consists of \emph{expressions}.
+
+  \+
+  An \emph{expression} is a combination of constants, variables,
+  operators, and functions that are interpreted to produce another
+  value.
+
+  \+
+  Examples of Julia language expressions are:
+  `\lstinline|2+2|',
+  `\lstinline|E = ones(3,3)|',
+  `\lstinline|print(42)|'.
+
+  \+
+  \begin{references}
+    \url{https://en.wikipedia.org/wiki/Expression_(computer_science)}
+  \end{references}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lines of code}
+  Julia expressions can be spread over multiple lines.
+
+  \+ At the REPL, if you press the \emph{Enter} key when an expression
+  is not yet complete, Julia just continues reading. (You get no
+  ``\texttt{julia>}'' prompt.)
+
+  \+ You can combine multiple expressions in a single line with
+  `\texttt{;}':
+\begin{semiverbatim}
+\julia 1+1; 2+2
+4
+\end{semiverbatim}
+
+  (Note that only the last value is printed. \emph{Why?})
+\end{frame}
+
+
+\section{Variables, data types, and operations}
+
+\begin{frame}[fragile,fragile]
+  \frametitle{Strings and characters, I}
+  Strings must be included in \emph{double} quotes (\texttt{"}):
+\begin{semiverbatim}
+\julia "This is a string"
+"This is a string"
+\end{semiverbatim}
+
+  \+
+  To include double quotes in a string, \\ escape them with `\texttt{\textbackslash}':
+\begin{semiverbatim}
+\julia print("\HL{{\textbackslash}"}Yes\HL{{\textbackslash}"}, he said.")
+He said: "42"
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Strings and characters, II}
+  Multi-line strings are delimited by three quote characters.
+\begin{lstlisting}[showstringspaces=false]
+~\julia~ a = """This is a string,
+~\hspace{6ex}~ that extends over more
+~\hspace{6ex}~ than one line.
+~\hspace{6ex}~ """
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile,fragile]
+  \frametitle{Strings and characters, III}
+  Single quotes (\texttt{'}) delimit \emph{characters}:
+\begin{semiverbatim}\smaller
+\julia 'a'
+'a': ASCII/Unicode U+0061 (category Ll: Letter, lowercase)
+
+\julia 'ε'
+'ε': Unicode U+03b5 (category Ll: Letter, lowercase)
+\end{semiverbatim}
+
+  \+ Note that it's an error to include more than one character
+  between single quotes:
+\begin{semiverbatim}
+\julia 'abc'
+\textcolor{red}{\textbf{ERROR}: syntax: invalid character literal}
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Operators}
+  All the usual unary and binary arithmetic operators are
+  defined in Julia: \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/},
+  \texttt{**}~(exponentiation), \texttt{<{}<}, \texttt{>{}>}, etc.
+
+  \+ Logical operators are expressed using symbols:
+  \lstinline|&&| for \emph{and},
+  \lstinline:||: for \emph{or},
+  \lstinline|!| for \emph{not}.
+
+  \+
+  Numerical and string comparison also follows the usual notation:
+  \texttt{<}, \texttt{>}, \texttt{<=}, \texttt{==}, \texttt{!=},
+  \ldots
+
+  \+
+  \begin{references}
+    \tiny
+    \begin{itemize}
+    \item \url{https://docs.julialang.org/en/v1/base/base/#All-Objects-1}
+    \end{itemize}
+  \end{references}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Your first exercise}
+    \begin{center}
+      {\Large How much is {$2^{36}$} ?}
+
+      \+
+      {\Large And how much is {$2^{72}$} ?}
+    \end{center}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Getting the type of a value}
+
+  The type of a Julia value can be gotten via the \texttt{typeof()} function:
+\begin{semiverbatim}
+\julia typeof("a")
+String
+
+\julia typeof(42)
+Int64
+
+\julia typeof(NaN)
+Float64
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Common types (integer)}
+
+  Types of common literal and variable values:
+  \begin{description}
+  \item[Int64] 64-bit Integer numbers: \texttt{1}, \texttt{-2}, \ldots
+    up to \texttt{9223372036854775807}
+  \item[Int32] 32-bit integer number: from \texttt{-2147483648} to \texttt{2147483647}.
+  \item[UInt64] 64-bit non-negative \emph{(unsigned)} integer: from
+    \texttt{0} up to \texttt{18446744073709551614}.
+  \item[UInt32] 32-bit non-negative \emph{(unsigned)} integer.
+  \item[BigInt] Unbounded integer.
+  \end{description}
+
+  \+
+  \begin{references}
+    \url{https://docs.julialang.org/en/v1/manual/integers-and-floating-point-numbers/index.html}
+  \end{references}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Common types (floating-point)}
+
+  Types of common literal and variable values:
+  \begin{description}
+  \item[Float64] Double precision floating-point numbers, e.g.:
+    \texttt{3.1415}, \texttt{-1e-3}.
+  \item[Float32] Single precision floating-point numbers.
+  \item[Float16] Half-precision floating-point numbers.
+  \item[BigFloat] Arbitrary-precision floating-point number.
+  \end{description}
+
+  \+
+  \begin{references}
+    \url{https://docs.julialang.org/en/v1/manual/integers-and-floating-point-numbers/index.html}
+  \end{references}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Common types (misc)}
+
+  Types of common literal and variable values:
+  \begin{description}
+  \item[Bool] The type of the two boolean constants \texttt{true}, \texttt{false}.
+  \item[Complex{...}] A complex number; note there are different
+    complex number types as there are (real) number types!
+  \item[Rational{...}] A rational number (quotient of two integers);
+    note there are different \texttt{Rational} types as there are
+    integer types!
+  \item[String] Text (string of UNICODE characters).
+  \end{description}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Literal values (generic)}
+  \smaller
+
+  When you enter values into the Julia REPL or a text file, the type
+  is inferred using some simple criteria:
+
+  \+
+  \begin{describe}{\texttt{1234}}
+    \texttt{Int64}: all digits, no decimal dot (`\texttt{.}').
+  \end{describe}
+
+  \begin{describe}{\texttt{123.4} \emph{or} \texttt{123.4e5}}
+    \texttt{Float64}: all digits with a dot, or using the \href{https://en.wikipedia.org/wiki/Scientific_notation}{scientific notation} with `\texttt{e}' (\texttt{123.4e5} meaning $123.4 \times 10^5$)
+  \end{describe}
+
+  \begin{describe}{\texttt{123.4f5}}
+    \texttt{Float32}: scientific notation with `\texttt{f}' to separate mantissa from exponent.
+  \end{describe}
+
+  \begin{describe}{\texttt{1 + 2im}}
+    \texttt{Complex}: sum notation, the imaginary part has the suffix `\texttt{im}'.
+  \end{describe}
+
+  \begin{describe}{\texttt{1//2}}
+    \texttt{Rational}: a pair of integer numbers sparated by `\texttt{//}'.
+  \end{describe}
+
+  \+
+  The same format is used for printing back values.
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Literal values (floating-point)}
+  Floating-point types allow some special non-numeric values:
+
+  \begin{describe}{\texttt{Inf}}
+    Infinity (with `\texttt{+}' or `\texttt{-}' sign); used to
+    represent some limits (e.g., `\texttt{1. / 0.})
+  \end{describe}
+
+  \begin{describe}{\texttt{NaN}}
+    \href{https://en.wikipedia.org/wiki/NaN#Floating_point}{``Not a
+      number''}; used to represent indeterminate mathematical
+    operations (e.g., \texttt{0. / 0.})
+  \end{describe}
+
+  \+ Note: \textbf{Letter case matters!} `\texttt{nan}' and
+  `\texttt{inf}' are names of (probably unbound) variables, not the
+  floating-point constants.
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Type conversion, I}
+  You can force Julia to convert a value into a compatible type by
+  using the \texttt{convert} function.
+
+  \+ %For example:
+\begin{semiverbatim}
+\julia convert(Float64, 1)
+1.0
+
+\julia convert(Int64, 42.0)
+42
+
+\julia convert(BigInt, 42)
+42
+\julia typeof(ans)
+BigInt
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile]
+  \frametitle{Assignment of variables, I}
+  Assignment is done via the `\texttt{=}' statement:
+\begin{semiverbatim}
+\julia x = 42
+42
+\end{semiverbatim}
+
+  \+ Note: \textbf{assignment is an expression} in Julia: it evaluates
+  to the value being assigned to the variable.  For example:
+\begin{semiverbatim}
+\julia (x = 42) / 2
+21.0
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Assignment of variables, II}
+  There are a few shortcut notations for updating an assigned variable:
+  \begin{itemize}
+  \item[] \texttt{\emph{a} += \emph{b}} is short for \texttt{\emph{a} = \emph{a} + \emph{b}},
+  \item[] \texttt{\emph{a} -= \emph{b}} is short for \texttt{\emph{a} = \emph{a} - \emph{b}},
+  \item[] \texttt{\emph{a} *= \emph{b}} is short for \texttt{\emph{a} = \emph{a} * \emph{b}},
+  \item[]   etc. --- one for every legal operator.
+  \end{itemize}
+
+  \+ For example:
+\begin{semiverbatim}
+\julia x = 21;
+
+\julia x *= 2
+42
+\end{semiverbatim}
+
+  \+
+  (Note that `\texttt{==}' is the \emph{equality comparison} operator, not an assignment operator!)
+\end{frame}
+
+
+\begin{frame}
+  \begin{exercise*}[1.B]
+    How do you compute $2^{72}$ with Julia?
+
+    (The result has to be an integer.)
+  \end{exercise*}
+\end{frame}
+
+
+% \begin{frame}[fragile]
+%   \frametitle{Type conversion, II}
+%   Alternatively, type names double up as conversion functions themselves:
+
+%   \+ %For example:
+% \begin{semiverbatim}
+% \julia Float64(1)
+% 1.0
+
+% \julia Int64(42.0)
+% 42
+
+% \julia BigInt(42)
+% 42
+% \julia typeof(ans)
+% BigInt
+% \end{semiverbatim}
+% \end{frame}
+
+
+% \begin{frame}[fragile]
+%   \frametitle{Type conversion, III}
+
+%   \texttt{convert} and type constructors differ in subtle ways:
+%   \begin{enumerate}
+%   \item On arrays and other composite values, type constructors take a
+%     copy whereas \texttt{convert} may return the arguments unchanged
+%     (if the types agree).
+%   \item Type constructor may allow other parameters:
+% \begin{semiverbatim}
+% \julia Float64(π)
+% 3.141592653589793
+
+% \julia Float64(π, \HL{RoundUp})
+% 3.141592653589793\HL{6}
+% \end{semiverbatim}
+%   \end{enumerate}
+% \end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Converting to and from String}
+  You cannot cast a numeric value into a string or vice-versa using \texttt{convert}:
+  %or the constructor syntax:
+\begin{semiverbatim}\smaller
+\julia convert(String, 42)
+\ERROR{MethodError: Cannot `convert` an object of type Int64
+to an object of type String}
+
+\julia convert(Int64, "42")
+\ERROR{MethodError: Cannot `convert` an object of type String
+to an object of type Int64}
+\end{semiverbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Converting \emph{from} String}
+  Converting a String into a value of another type is done by function \texttt{parse}:
+\begin{semiverbatim}
+julia> parse(Int64, "42")
+42
+
+julia> parse(Float32, "42")
+42.0f0
+\end{semiverbatim}
+
+  \+
+  Note that \texttt{parse} isn't for numbers only!
+\begin{semiverbatim}
+\julia parse(Color, "black")
+RGB{N0f8}(0.0,0.0,0.0)
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile,fragile]
+  \frametitle{Converting \emph{to} String: interpolation}
+  String interpolation means that character representation of values
+  are substituted into a template string.
+
+  \+ Julia allows substitution of values into strings using the
+  `\texttt{\$(\emph{\ldots})}' syntax:
+\begin{semiverbatim}
+\julia x = 42;
+
+\julia "$(x) is the ultimate answer!"
+"42 is the ultimate answer!"
+\end{semiverbatim}
+
+  Note that \emph{any Julia expression} be used inside `\texttt{\$(\emph{\ldots})}':
+\begin{semiverbatim}
+\julia "$((x-21)*2) is the ultimate answer!"
+"42 is the ultimate answer!"
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Formatting output}
+  \smaller
+
+  Plain string interpolation does not allow you to control the printed
+  format of numeric expressions (e.g., how many decimal digits).
+
+  \+
+  Julia's standard library comes with the \texttt{@sprintf} macro (in
+  the ``Printf'' module) which allows using
+  \href{https://alvinalexander.com/programming/printf-format-cheat-sheet}{C-style
+    format specifiers}:
+\begin{semiverbatim}
+\julia using Printf  # load `Printf' module
+\julia @sprintf("%03.5e", 12.3)
+"1.23000e+01"
+\julia @sprintf("%03.5g", 12.3)
+"12.3"
+\julia @sprintf("%03.5f", 12.3)
+"12.30000"
+\julia @sprintf("%+8s %s %-8s", "welcome", "to", "julia")
+" welcome to julia   "
+\end{semiverbatim}
+
+  \+
+  \begin{seealso}
+    \url{https://alvinalexander.com/programming/printf-format-cheat-sheet}
+  \end{seealso}
+\end{frame}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

@@ -1,0 +1,593 @@
+\documentclass[english,serif,mathserif,xcolor=pdftex,dvipsnames,table]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+
+\usetheme[informal]{s3it}
+\usepackage{s3it}
+
+
+\title[2. Functions]{%
+  A Short and Incomplete Introduction to Julia
+}
+\subtitle{\bfseries Part 2: Functions}
+\author[R.~Murri]{%
+  \textbf{Riccardo Murri} \texttt{<riccardo.murri@uzh.ch>}
+  \\
+  S3IT: Services and Support for Science IT,
+  \\
+  University of Zurich
+}
+\date{September 12, 2019}
+
+
+%% simulate IJulia prompt
+\newcounter{prompt}
+\newcommand\I{%
+  \global\def\promptnr{\arabic{prompt}}%
+  \stepcounter{prompt}%
+  {\color{blue}\bfseries In~[\promptnr]:}%
+}
+\renewcommand\O{{\color{red}\bfseries Out[\promptnr]:}}
+\newcommand\C{{\color{blue}   ...:}}
+
+\begin{document}
+
+% title frame
+\maketitle
+
+
+\part{Functions}
+
+\begin{frame}[fragile,label=func1]
+  \frametitle{Functions, I}
+  Functions are called by postfixing the function name with a
+  parenthesized argument list.
+
+  \+
+\begin{semiverbatim}
+\julia string(42)
+"42"
+\julia string("x=", 42)
+"x=42"
+\julia log10(1e42)
+42.0
+\julia √(1764)  # {\textbackslash}sqrt + TAB
+42.0
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile]
+  \frametitle{Functions, II}
+  Some functions can take a variable number of arguments. For instance:
+
+  \+
+  \begin{description}
+    \item[max($x_0$, \ldots, $x_n$)] Return the maximum of $\{ x_0, \ldots, x_n \}$
+    \item[min($x_0$, \ldots, $x_n$)] Return the minimum of $\{ x_0, \ldots, x_n \}$
+    \item[string($x_0$, \ldots, $x_n$)] Return the concatenation of printed representation of all arguments.
+  \end{description}
+
+  \+
+  Examples:
+\begin{semiverbatim}
+\julia max(1,2,3)
+3
+\julia string("x=",1,2,3)
+"x=123"
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{How to define new functions}
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
+\begin{lstlisting}
+"""
+A friendly function.
+"""
+~\HL{\textbf{function}}~ greet(name)
+  println("Hello, $(name)!)
+~\HL{\textbf{end}}~
+
+# the customary greeting
+greet("world")
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedleft
+      A function definition is enclosed by the keyword \textbf{function} and a matching \textbf{end}.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
+\begin{lstlisting}
+"""
+A friendly function.
+"""
+function greet(name)
+  println("Hello, $(name)!)
+end
+
+~\HL{\it\tt\#\ the customary greeting}~
+greet("world")
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedleft
+       (This is a comment. It is ignored by Julia, just like blank lines.)
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
+\begin{lstlisting}
+"""
+A friendly function.
+"""
+function greet(name)
+  println("Hello, $(name)!)
+end
+
+# the customary greeting
+~\HL{greet("world")}~
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedleft
+      This calls the function \\ just defined.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
+\begin{lstlisting}
+~\HL{"""}~
+~\HL{A friendly function.}~
+~\HL{"""}~
+function greet(name)
+  println("Hello, $(name)!)
+end
+
+# the customary greeting
+greet("world")
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedleft
+      What is this? The answer in the next exercise!
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}
+  \begin{exercise*}[2.A]
+    Type and run the code on the previous page at the interactive
+    prompt.
+
+    \+
+    What's the result of evaluating the function \texttt{greet("world")}?
+
+    \+
+    What does \texttt{?greet} output?
+  \end{exercise*}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Default values}
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
+\begin{lstlisting}
+~\julia~
+  function greet(~\HL{name="world"}~)
+    println("Hello, $(name)!")
+  end
+~\hbox{greet (generic function with 2 methods)}~
+
+~\julia~ greet()
+Hello, world!
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedleft
+      Function arguments can have default values.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% \begin{frame}[fragile]
+%   \frametitle{How to define new functions}
+%   \begin{columns}[t]
+%     \begin{column}{0.5\textwidth}
+% \begin{lstlisting}
+% """
+% A friendly function.
+% """
+% function greet(name)
+%   println("Hello, $(name)!)
+% end
+
+% # the customary greeting
+% greet("world")
+% \end{lstlisting}
+%     \end{column}
+%     \begin{column}{0.5\textwidth}
+%       \raggedleft
+
+%     \end{column}
+%   \end{columns}
+% \end{frame}
+
+
+% \begin{frame}[fragile,fragile,fragile]
+%   \frametitle{Named arguments}
+% You can mark some function arguments as being passed ``by name only'':
+% \begin{semiverbatim}
+% \julia function geomseq(n, r\HL{;} a=1)
+%        collect(a*r^k for k in 1:n)
+%        end
+% geomseq (generic function with 1 method)
+% \end{semiverbatim}
+
+% \+ All arguments coming after the `\texttt{;}' character must be given
+% using the \texttt{name=value} syntax when calling the function:
+% \begin{semiverbatim}
+% \julia geomseq(2, 4, a=3)
+% 2-element Array{Int64,1}:
+%  12
+%  48
+% \julia geomseq(2, 4, 3)
+% \ERROR{MethodError: no method matching geomseq(::Int64, ::Int64, ::Int64)}
+% \end{semiverbatim}
+% \end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{The return value of functions}
+  A function call returns the value of the expression evaluated last:
+\begin{semiverbatim}
+\julia function f()
+       1
+       2
+       3
+       end
+f (generic function with 1 method)
+
+\julia f()
+3
+\end{semiverbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{The \texttt{return} keyword}
+
+  The {\ttfamily\bfseries return} keyword ends execution of a function.
+
+  \+ The expression following `\texttt{return}' sets the return value
+  of the function being called.
+
+  \+
+\begin{semiverbatim}
+\julia function f()
+       println("entering f()...")
+       return 2
+       println("f() is done by now")
+       end
+f (generic function with 1 method)
+
+\julia f()
+entering f()...
+2
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{The special value `nothing'}
+  If a \texttt{return} keyword is \emph{not} followed by any
+  expression, then the function returns a special value called
+  `\texttt{nothing}':
+\begin{semiverbatim}
+\julia \lstinline|function noval()|
+       \lstinline|return;  # no expression to evaluate|
+       \lstinline|end|
+noval (generic function with 1 method)
+\end{semiverbatim}
+
+  \+ The constant `\texttt{nothing}' has its own special type `\texttt{Nothing}':
+\begin{semiverbatim}
+\julia \lstinline|typeof(noval())|
+Nothing
+\end{semiverbatim}
+\end{frame}
+
+
+\part{Basic control flow}
+\begin{frame}[fragile]
+  \frametitle{Conditionals}
+  Conditional execution uses the \texttt{if} statement:
+\begin{lstlisting}
+if ~\it test-expr~
+  # evaluate these expressions
+elseif ~\it other-test-expr~
+  # evaluate these
+else
+  # executed if none of the above matched
+end
+\end{lstlisting}
+
+  \+The \texttt{elseif} can be repeated, with different conditions, or
+  left out entirely.
+
+  \+
+  Also the \texttt{else} clause is optional.
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Truth values, I}
+  \small
+
+  Test expressions used in \texttt{if} and \texttt{elseif} clauses
+  \emph{must} evaluate to a boolean value: one of the two constants
+  `\texttt{true}' or `\texttt{false}'.
+
+  \+
+  All relational and comparison operators return boolean values:
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+\begin{semiverbatim}
+\julia \textbf{if} 1 > 0
+    println("A truism.")
+  \textbf{else}
+    print("It's false!!")
+  \textbf{end}
+A truism.
+\end{semiverbatim}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+\begin{semiverbatim}
+\julia \textbf{if} NaN == NaN
+    println("A truism.")
+  \textbf{else}
+    print("It's false!!")
+  \textbf{end}
+It's false!
+\end{semiverbatim}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Truth values, II}
+  \small
+
+  Test expressions used in \texttt{if} and \texttt{elseif} clauses
+  \emph{must} evaluate to a boolean value: one of the two constants
+  `\texttt{true}' or `\texttt{false}'.
+
+  \+ Integers, strings, or other types cannot be used \\ in \texttt{if}'s
+  test expression:
+\begin{semiverbatim}
+\julia \textbf{if} 1  # Python would allow this!
+    println("A truism.")
+  \textbf{else}
+    print("It's false!!")
+  \textbf{end}
+\ERROR{TypeError: non-boolean (Int64) used
+in boolean context}
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{The ternary operator}
+  All code is an expression in Julia, so an `\texttt{if}' block
+  returns the value of the last expression evaluated:
+\begin{lstlisting}
+~\julia~ x = if (name == "Julia"); '~$\heartsuit$~' else '~$\spadesuit$~' end
+'~$\spadesuit$~': Unicode U+2660 (category So: Symbol, other)
+\end{lstlisting}
+
+  \+ Testing and selecting one of two values is so common, it has an
+  abbreviation:
+\begin{lstlisting}
+~\julia~ x = (name == "Julia") ~\textbf{?}~ '~$\heartsuit$~' ~\textbf{:}~ '~$\spadesuit$~'
+'~$\spadesuit$~': Unicode U+2660 (category So: Symbol, other)
+\end{lstlisting}
+  Note that `\texttt{?}' must be preceded by a space.
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{\texttt{while}-loops}
+  Conditional looping uses the \texttt{while} statement:
+\begin{lstlisting}
+while ~\it test-expr~
+  # expressions
+end
+\end{lstlisting}
+
+  \+
+  To break out of a \texttt{while} loop, use the \texttt{break}
+  statement.
+
+  \+
+  Use the \texttt{continue} statement anywhere in the expression
+  block to jump back to the \texttt{while} statement.
+
+  \+ Again, all code is an expression in Julia, so also a
+  `\texttt{while}' block returns the value of the last expression
+  evaluated.
+\end{frame}
+
+
+\begin{frame}
+  \begin{exercise*}[2.B]
+    Modify the \texttt{greet()} function to print `$\heartsuit$'{}\footnote{Use
+      \texttt{{\textbackslash}heartsuit} followed by the TAB key.} if
+    the argument \texttt{name} is the string \texttt{'Julia'}.
+  \end{exercise*}
+
+  \+
+  \begin{exercise*}[2.C]
+    Write a function \texttt{greetmany()} that repeatedly:
+    \begin{enumerate}
+    \item     Asks the user for a name;
+    \item     Prints a greeting to the person by that name.
+    \end{enumerate}
+
+    The function should keep asking until the user enters the single
+    letter `\texttt{q}' as the name.
+
+    Julia's built-in function \texttt{readline()} can be used to input a string.
+  \end{exercise*}
+\end{frame}
+
+
+\part{Packages}
+
+% \begin{frame}
+%   \frametitle{Using functions defined in another file}
+%   Julia code is organized into modules, files, and packages:
+
+%   \begin{describe}{modules}
+%     Modules are collections of variables and functions. A module is a
+%     \emph{namespace}: bindings with the same name can coexist in the
+%     different modules without interfering.
+%   \end{describe}
+
+%   \begin{describe}{files}
+%     Files containing Julia code have the suffix `\texttt{.jl}'; they
+%     must use the UTF-8 encoding.
+%   \end{describe}
+
+%   \begin{describe}{packages}
+%     A package is a collection of files, structured in a way that
+%     Julia's built-in package manager can recognize.
+%   \end{describe}
+
+%   \+
+%   \begin{seealso}
+%     \url{https://en.wikibooks.org/wiki/Introducing_Julia/Modules_and_packages}
+%   \end{seealso}
+% \end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Using functions defined in another file, I}
+  \small
+
+  Julia code is organized into modules, files, and packages.
+
+  \+ You can make functions from other packages usable from the
+  current module with the \texttt{using} keyword:
+\begin{lstlisting}
+~\julia~ @sprintf("working?")
+~\ERROR{LoadError: UndefVarError: @sprintf not defined}~
+
+~\julia~ ~\HL{\textbf{using} Printf}~
+
+~\julia~ @sprintf("working!")
+"working!"
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile,fragile]
+  \frametitle{Using functions defined in another file, II}
+  Using a package will \emph{not} overwrite functions:
+\begin{lstlisting}
+~\julia~ function red(c)
+       "Defined in Main"
+       end
+~{red (generic function with 1 method)}~
+
+~\julia~ using Colors
+
+~\julia~ red == Colors.red
+false
+
+~\julia~ green == Colors.green
+true
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile,fragile,fragile]
+  \frametitle{Using functions defined in another file, III}
+  \small
+  To know in what module a function is defined, use the macro \texttt{@which}:
+\begin{lstlisting}
+~\julia~ @which red
+Main
+
+~\julia~ @which green
+ColorTypes
+\end{lstlisting}
+  (\texttt{Main} is the module where Julia loads definitions by default.)
+
+  \+
+  To list all symbols (functions and variables) defined in a
+  module, use the function \texttt{names(ModuleName)}:
+\begin{lstlisting}
+~\julia~ names(Printf)
+3-element Array{Symbol,1}:
+ Symbol("@printf")
+ Symbol("@sprintf")
+ :Printf
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Installing packages}
+  The standard package \texttt{Pkg} can be used to install new packages:
+\begin{lstlisting}
+~\julia~ ~\HL{\textbf{using} Pkg}~
+
+~\julia~ ~\HL{Pkg.add("Colors")}~
+  Updating registry at `~\textasciitilde~/.julia/registries/General`
+  ~\ldots~
+ [no changes]
+\end{lstlisting}
+
+  Note that \texttt{\texttt{Pkg}} does not export its functions, so to
+  call them one has to prefix the name with `\,\texttt{Pkg.}'
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \small
+
+  For a better understanding of Julia's package system \\ and its (many) nuances, see:
+  \begin{itemize}
+  \+\item \url{https://en.wikibooks.org/wiki/Introducing_Julia/Modules_and_packages}
+    Wikibook ``Introducing Julia'' for a practical summary of all the options.
+  \+\item \url{https://docs.julialang.org/en/v1/manual/modules/} Julia's manual section on ``Modules'' for details of the relationship between modules, files, and packages.
+  \+\item \url{https://docs.julialang.org/en/v1/manual/code-loading/}
+    Julia's manual section on ``Code loading'' for details on how
+    files are organized in packages and how to define local packages.
+  \end{itemize}
+\end{frame}
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

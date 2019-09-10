@@ -1,0 +1,898 @@
+\documentclass[english,serif,mathserif,xcolor=pdftex,dvipsnames,table]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+
+\usetheme[informal]{s3it}
+\usepackage{s3it}
+
+\title[3. Arrays]{%
+  A Short and Incomplete Introduction to Julia
+}
+\subtitle{\bfseries Part 3: Vectors and Loops}
+\author[R.~Murri]{%
+  \textbf{Riccardo Murri} \texttt{<riccardo.murri@uzh.ch>}
+  \\
+  S3IT: Services and Support for Science IT,
+  \\
+  University of Zurich
+}
+\date{September 12, 2019}
+
+
+\begin{document}
+
+% title frame
+\maketitle
+
+\part{Array basics}
+\begin{frame}[fragile,fragile]
+  \frametitle{Constructing Vectors}
+
+  Vectors (1D arrays) are created and initialized by enclosing values
+  in square brackets `\texttt{[}' and `\texttt{]}':
+\begin{lstlisting}
+~\julia~ v = [1, 2, 3, 4, 5]
+5-element Array{Int64,1}:
+ 1
+ 2
+ 3
+ 4
+ 5
+\end{lstlisting}
+
+  \+
+  An empty array is created by a pair of square brackets with
+  nothing in between:
+\begin{lstlisting}
+~\julia~ z = []
+0-element Array{Any,1}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{The Type of an Array}
+  Every value in Julia has a type \\ --- arrays are no exception:
+\begin{semiverbatim}
+\julia v = [1, 3, 3, 7];
+\julia typeof(v)
+\only<1>{\HL{Array\{Int64,1\}}}\only<2>{Array\{\HL{Int64},1\}}\only<3>{Array\{Int64,\HL{1}\}}
+\end{semiverbatim}
+
+  \+
+  \texttt{\alt<1>{\HL{Array\{\ldots\}}}{Array\{\ldots\}}} indicates a \emph{parametric} type:
+  \begin{itemize}
+  \item \texttt{\alt<2>{\HL{Int64}}{Int64}} is the type of elements in the array \\ (also available as \texttt{eltype(a)});
+  \item \texttt{\alt<3>{\HL{1}}{1}} is the number of dimensions.
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile]
+  \frametitle{Vectors, Matrices, Arrays}
+  \footnotesize%\smaller
+
+  Julia provides syntax for entering literal 1D and 2D arrays; \\
+  note the usage of `\texttt{\HL{,}}' vs.~`\texttt{\HL{\space}}'
+  vs.~`\texttt{\HL{;}}'
+
+  \+
+  \begin{tabular}[t]{p{0.45\linewidth}p{0.45\linewidth}}
+    \begin{minipage}{1.0\linewidth}
+      \raggedright
+      1D arrays are entered with commas and represented as (column) vectors:
+      \vspace{-1ex}
+\begin{semiverbatim}
+\julia v = [1\HL{,} 2\HL{,} 3]
+3-element Array{Int64,1}:
+ 1
+ 2
+ 3
+\end{semiverbatim}
+    \end{minipage}
+    &
+    \begin{minipage}{1.0\linewidth}
+      \vspace{-5ex}
+      \raggedright
+      Use space instead of comma for a ``wide'' matrix, which is
+      represented as a row vector:
+      \vspace{-1ex}
+\begin{semiverbatim}
+\julia w = [1\HL{\space}2\HL{\space}3]
+1×3 Array{Int64,2}:
+ 1  2  3
+\end{semiverbatim}
+    \end{minipage}
+    \\
+    \begin{minipage}{1.0\linewidth}
+      \vspace{2ex}
+      \raggedright
+      2D array (matrix) entry requires that rows are separated by semicolons:
+      \vspace{-1ex}
+\begin{semiverbatim}
+\julia m = [1 2\HL{;} 3 4]
+2×2 Array{Int64,2}:
+ 1  2
+ 3  4
+\end{semiverbatim}
+    \end{minipage}
+    &
+    \begin{minipage}{1.0\linewidth}
+      \raggedright
+      No literal entry syntax is there for higher-dimensional arrays.
+
+      \+
+      The \texttt{reshape()} function can be used to turn a vector
+      into an $N$-dimensional array.
+    \end{minipage}
+  \end{tabular}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Constructing arrays, I}
+    \small
+  Julia provides a few functions to provide commonly-used arrays.
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+      \begin{describe}{\texttt{zeros(type, size)}}
+        A newly-created array filled with \texttt{0}'s.
+\begin{lstlisting}
+~\julia~ zeros((2,3))
+2~$\times$~3 Array{Float64,2}:
+ 0.0  0.0  0.0
+ 0.0  0.0  0.0
+\end{lstlisting}
+      \end{describe}
+
+      \begin{describe}{\texttt{trues(size)}}
+        Same, but with boolean \texttt{true} entries.
+      \end{describe}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+      \begin{describe}{\texttt{ones(type, size)}}
+        A newly-created array filled with \texttt{1}'s.
+\begin{lstlisting}
+~\julia~ ones(2)
+2-element Array{Float64,1}:
+ 1.0
+ 1.0
+\end{lstlisting}
+      \end{describe}
+
+      \begin{describe}{\texttt{falses(size)}}
+        Same, but with boolean \texttt{false} entries.
+      \end{describe}
+    \end{column}
+  \end{columns}
+
+  \+
+  Argument \texttt{type} can be omitted and defaults to \texttt{Float64}.
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Constructing arrays, II}
+  \begin{columns}
+    \small
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+      \begin{describe}{\texttt{rand(type, size)}, \texttt{randn(type, size)}}
+        A newly-created array filled with random numbers.
+
+        \+
+        \texttt{rand} picks entries using a uniform distribution,
+        \texttt{randn} uses a normal one with $\mu=0$ and $\sigma=1$.
+      \end{describe}
+
+      \+
+      \begin{describe}{\texttt{similar(a)}}
+        Create an uninitialized array with the same element type and
+        size as the given array \texttt{a}.
+      \end{describe}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+      \begin{describe}{\texttt{rand(S, size)}}
+        A newly-created array filled with entries picked uniformly at
+        random from collection \texttt{S}.
+\begin{lstlisting}
+~\julia~ rand("julia", (2,3))
+2~$\times$~3 Array{Char,2}:
+ 'j'  'a'  'i'
+ 'l'  'u'  'a'
+\end{lstlisting}
+      \end{describe}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Accessing elements in vectors}
+  You can access individual items in a vector using the postfix
+  \texttt{[]} operator.
+
+  \+
+  Element indices start at 1.
+
+\begin{lstlisting}
+~\julia~ v[1]
+1
+~\julia~ v[2] * v[3]
+6
+\end{lstlisting}
+
+  \+
+  The keyword \texttt{end} can be used to get the last item of a vector:
+\begin{lstlisting}
+~\julia~ v[end]
+5
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Slices}
+  The notation \texttt{[$k$:$l$]} is used for accessing a \emph{slice}
+  of an array (the items at positions $k$, $k+1$, \ldots, $l$).
+\begin{lstlisting}
+~\julia~ v[2:4]
+3-element Array{Int64,1}:
+ 2
+ 3
+ 4
+\end{lstlisting}
+
+  \+ Again, one can use \texttt{end} in place of the number $l$ to
+  mean the length of the array.
+
+  \+ A single colon `\texttt{:}' abbreviates `\texttt{1:end}'.
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Accessing elements in arrays}
+  \smaller
+  For matrices and higher-dimensional arrays,
+  indices must be separated by a comma:
+\begin{lstlisting}
+~\julia~ m[1,1]
+1
+~\julia~ m[end, end]  # last item in each dim
+4
+
+~\julia~ a = reshape(1:27, (3,3,3)); # 3-D array
+~\julia~ a[1,2,3]
+22
+\end{lstlisting}
+
+  Slicing is possible in each dimension separately;
+  note that dimensions with just 1 index are dropped:
+\begin{lstlisting}
+~\julia~ a[:, 1:2, 1]  # 3x2(x1) slice
+3~$\times$~2 Array{Int64,2}:
+ 1  4
+ 2  5
+ 3  6
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Dimensions of an array}
+  \smaller
+
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+  \begin{describe}{\texttt{ndims(a)}}
+    Return number of dimensions of an array.
+\begin{semiverbatim}
+\julia ndims(v)
+1
+\julia ndims(a)
+3
+\end{semiverbatim}
+  \end{describe}
+
+  \begin{describe}{\texttt{length(a)}}
+    Return the number of elements in an array:
+\begin{semiverbatim}
+\julia length(v)
+5
+\julia length(a)
+27
+\end{semiverbatim}
+  \end{describe}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+  \begin{describe}{\texttt{size(a)}}
+    Return tuple of maximum index in each dimension.
+\begin{semiverbatim}
+\julia size(v)
+(3,)
+\julia size(a)
+(3, 3, 3)
+\end{semiverbatim}
+
+    Since indexing starts at 1, valid indices into \lstinline|i|-th
+    array dimension range from 1 up to \lstinline|size(a,i)|
+    \emph{(inclusive!)}.
+  \end{describe}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Item mutation}
+  You can replace items in an array by assigning them
+  a new value:
+\begin{semiverbatim}
+\julia \HL{v[2] = 9};
+
+\julia v
+5-element Array\{Int64,1\}:
+ \,\,1
+ \HL{9}
+ \,\,3
+ \,\,4
+ \,\,5
+\end{semiverbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Slice mutation, I}
+
+You can also replace an entire slice of an array:
+\begin{semiverbatim}
+\julia \HL{v[2:4] = [5,6,7]};
+\julia v
+5-element Array\{Int64,1\}:
+ \,\,1
+ \HL{5}
+ \HL{6}
+ \HL{7}
+ \,\,5
+\end{semiverbatim}
+
+The new slice \emph{must} have the same length of the one it is replacing:
+\begin{lstlisting}
+~\julia~ v[2:4] = [5,6,7,8,9];
+~\ERROR{DimensionMismatch("tried to assign 5 elements to 3 destinations")}~
+\end{lstlisting}
+\end{frame}
+
+
+\part{Loops}
+\begin{frame}[fragile]
+  \frametitle{\texttt{for}-loops}
+    With the  \texttt{for} statement, you can \textbf{loop over the items of
+    a range or collection}:
+\begin{lstlisting}
+for i in 1:3
+  # loop block
+  println(i*i)
+end
+\end{lstlisting}
+
+  \+
+  To break out of a \texttt{for} loop, use the \texttt{break}
+  statement.
+
+  \+
+  To jump to the next iteration of a \texttt{for} loop, use the
+  \texttt{continue} statement.
+\end{frame}
+
+
+\begin{frame}[fragile]
+  The \texttt{for} statement can be used \\ to loop over elements in \emph{any collection}.
+
+  \+
+  \begin{columns}[c]
+    \smaller
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+      Loop over vectors:
+      \vspace{-1ex}
+\begin{lstlisting}
+~\julia~
+  for n in [1,2,3]
+    println(n)
+  end
+1
+2
+3
+\end{lstlisting}
+
+      \+ Loop over strings:
+      \vspace{-1ex}
+\begin{lstlisting}
+~\julia~
+  for ch in "abc"
+    println(ch)
+  end
+a
+b
+c
+\end{lstlisting}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+      Loop over matrices and arrays:
+      \vspace{-1ex}
+\begin{lstlisting}
+~\julia~
+  for n in [1 2; 3 4]
+    println(n)
+  end
+1
+3
+2
+4
+\end{lstlisting}
+
+      \+ Loop over tuples:
+      \vspace{-1ex}
+\begin{lstlisting}
+~\julia~ for x in (4, 2)
+         println(x)
+       end
+4
+2
+\end{lstlisting}
+
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \begin{exercise*}[3.A]
+    Write a function \texttt{avg(v)} that takes a vector \texttt{v} of
+    numbers and returns their mean value.
+  \end{exercise*}
+
+  \+
+  \begin{exercise*}[3.B]
+    Write a function \texttt{tr(m)} which, given a (square) matrix
+    \texttt{m}, returns its \emph{trace}, i.e., sum of the elements
+    along the main diagonal.
+  \end{exercise*}
+
+  \+
+  \begin{exercise*}[3.C]
+    Write a function \texttt{eye($n$)} which, given an integer
+    $n>0$, returns the $n\times n$ identity matrix.
+  \end{exercise*}
+
+  \+
+  \begin{exercise*}[3.D]
+    Write a function \texttt{flip(m)} which, given a matrix
+    \texttt{m}, returns its transpose.
+  \end{exercise*}
+\end{frame}
+
+
+\part{Vector operations}
+\begin{frame}
+  \frametitle{Vector operations}
+  By virtue of having a 1D index set, Vectors support a few operations
+  that generic array cannot.
+
+  \+
+  They are quickly recalled here.
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Slice mutation, II}
+
+  Function \texttt{splice!} can be used to replace a slice of a \emph{vector}
+  with one of a different length:
+\begin{semiverbatim}
+\julia \HL{splice!(v, 2:4, [5,6,7,8,9])};
+\julia v
+7-element Array\{Int64,1\}:
+ \,\,1
+ \HL{5}
+ \HL{6}
+ \HL{7}
+ \HL{8}
+ \HL{9}
+ \,\,5
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{The meaning of the bang!}
+
+  By convention, a ``bang'' character `\texttt{!}' marks functions that \emph{mutate}
+  their first argument \emph{in-place}.
+
+  \+ In other words, the bang signals that something is going to be
+  changed destructively without an easy way to undo the effects.
+
+  \+
+  This convention is followed consistently in Julia's standard library.
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Operating on vectors, I}
+  \smaller
+
+  \begin{describe}{\ttfamily push!(v,e), pushfirst!(v,e)}
+    Extend vector \texttt{v} and insert item \texttt{e} as last
+    (\texttt{push!}) or first (\texttt{pushfirst!}).
+  \end{describe}
+
+  \begin{describe}{\ttfamily pop!(v), popfirst!(v)}
+    Remove the last (\texttt{pop!}) or first (\texttt{popfirst!}) item
+    in vector \texttt{v} and return it.
+  \end{describe}
+
+  \begin{describe}{\ttfamily append!(v1,v2), prepend!(v1,v2)}
+    Extend \texttt{v1} by adding elements of \texttt{v2} to its start or end.
+  \end{describe}
+
+  \begin{describe}{\ttfamily insert!(v, index, item)}
+    Insert an item into \texttt{v} at the given index.
+  \end{describe}
+
+  \begin{describe}{\ttfamily deleteat!(v, index)}
+    Remove the item at the given index and return the modified vector~\texttt{v}.
+    Subsequent items are shifted to fill the resulting gap.
+  \end{describe}
+
+  \+
+  \begin{references}
+    \begin{itemize}
+    \item \url{https://docs.julialang.org/en/v1/base/arrays/}
+  \end{itemize}
+  \end{references}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Operating on vectors, II}
+
+% resize!(a::Vector, n::Integer) -> Vector
+% Resize a to contain n elements. If n is smaller than the current collection length, the first n elements will be retained. If n is larger, the new elements are not guaranteed to be initialized.
+
+\begin{describe}{\ttfamily sort(v), sort!(v)}
+  Return a sorted copy (\texttt{sort}) of vector \texttt{v}, or sort
+  it in-place \texttt{(sort!)}.  Use \texttt{sort(v, rev=true)} to
+  reverse the ordering.
+\end{describe}
+
+  \begin{describe}{\ttfamily reverse(v), reverse!(v)}
+    Return a copy of \texttt{v} reversed from start to end;
+    or reverse it in-place.
+  \end{describe}
+
+% sortperm(v; alg::Algorithm=DEFAULT_UNSTABLE, lt=isless, by=identity, rev::Bool=false, order::Ordering=Forward)
+% Return a permutation vector I that puts v[I] in sorted order.
+
+  \+
+  \begin{references}
+    \begin{itemize}
+    \item \url{https://docs.julialang.org/en/v1/base/sort/}
+  \end{itemize}
+  \end{references}
+\end{frame}
+
+
+\begin{frame}
+  \begin{exercise*}[3.E]
+    Write a function \texttt{median(v)} that takes a vector \texttt{v}
+    of numbers and returns the median value.
+  \end{exercise*}
+
+  \+
+  \begin{exercise*}[3.F]
+    Write a function \texttt{evens(v)} that takes a list \texttt{v} of
+    integers and returns a list of all the even ones.
+  \end{exercise*}
+
+  \+
+  \begin{exercise*}[3.G]
+    Write a function \texttt{deviation(v, u)} that takes a vector \texttt{v} of
+    numbers and a single value \texttt{m} returns a list with the difference of
+    \texttt{u} and each element \texttt{x} of \texttt{v}.
+  \end{exercise*}
+\end{frame}
+
+%%%% MAP/REDUCE, ANONYMOUS FN, ARRAY COMPREHENSIONS?
+
+\begin{frame}[fragile]
+  \frametitle{map, reduce, filter (1)}
+
+  Constructing a new collection by looping over a given one and applying a function
+  on all elements is so common that there are specialized functions for that:
+
+  \begin{describe}{\texttt{map(fn, a)}}
+    Return a new collection formed by applying function \texttt{fn(x)}
+    to every element \texttt{x} of array \texttt{a}.
+  \end{describe}
+
+  \+
+  \begin{describe}{\texttt{filter(fn, a)}}
+    Return a new collection formed by elements \texttt{x} of array
+    \texttt{a} for which \texttt{fn(x)} evaluates to a \texttt{true} value.
+  \end{describe}
+
+  \+
+  \begin{seealso}
+    \url{https://en.wikibooks.org/wiki/Introducing_Julia/Functions#Map}
+  \end{seealso}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{map, reduce, filter (2)}
+
+  \begin{describe}{reduce(fn2, a)}
+    Apply \emph{associative} 2-ary function \texttt{fn2(x,y)} to the
+    first two items \texttt{x} and \texttt{y} of collection \texttt{a}, then
+    apply \texttt{fn2} to the result and the third element of
+    \texttt{L}, and so on until all elements have been processed ---
+    return the final result.
+  \end{describe}
+
+  \+
+  \begin{seealso}
+    \url{https://en.wikibooks.org/wiki/Introducing_Julia/Functions#Reduce_and_folding}
+  \end{seealso}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  This is how you could rewrite Exercises~3.F and~3.G using \texttt{map} and
+  \texttt{filter}.
+
+  \begin{columns}
+    \begin{column}{0.5\linewidth}
+\begin{jl}
+# *** Exercise 3.F ***
+function evens(v)
+  filter(iseven, v)
+end
+\end{jl}
+\end{column}
+\begin{column}{0.5\linewidth}
+\begin{jl}
+# *** Exercise 3.G ***
+function deviation(v, u)
+  # note: can define
+  # func's in func's!
+  delta(x) = abs(x-u)
+  return map(delta, v)
+end
+\end{jl}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile]
+  \frametitle{Anonymous functions}
+  \small
+  With higher-order functions, it is sometimes convenient being able
+  to use functions defined ``on the spot''.
+
+  \+ Julia allows an alternate syntax for functions, specifying names
+  of parameters and an expression to compute:
+\begin{semiverbatim}
+\julia x -> if x>0; exp(-(1/x)^2); else 0; end
+\#21 (generic function with 1 method)
+\end{semiverbatim}
+
+  \+ Note that functions defined this way are not assigned a name!
+  This syntax is meant to produce a function to be immediately used:
+\begin{semiverbatim}
+\julia map((x -> iseven(x) ? "odd" : "even"),
+           rand(Int64, 3))
+3-element Array{String,1}:
+ "odd"
+ "even"
+ "odd"
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{The `do' notation, I}
+  % Anonymous functions are convenient for short expressions;
+  % for longer and more elaborate computations,
+  % \texttt{map()}, \texttt{filter()}, \texttt{reduce()}
+  % support yet another way of specifying a computation to be applied:
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+\begin{jl}
+# turn array of int's
+# into corresponding
+# Roman numerals
+~\HL{map(a)}~ do num
+  if num == 1
+    return "I"
+  elseif num == 2
+    return "II"
+    # ...
+  end
+end # close `do` block
+\end{jl}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+      Any function whose \emph{first} argument is a function can be
+      used with \texttt{do}: e.g., \texttt{map()}, \texttt{filter()},
+      etc.
+
+      \+ The expression defined after \texttt{do} is inserted into the
+      function call as the first argument.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{The `do' notation, II}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+\begin{jl}
+# turn array of int's
+# into corresponding
+# Roman numerals
+map(a) ~\HL{\textbf{do}}~ num
+  if num == 1
+    return "I"
+  elseif num == 2
+    return "II"
+    # ...
+  end
+~\HL{\textbf{end}}~ # close `do` block
+\end{jl}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+      The \lstinline|do| block must be closed by a corresponding
+      \lstinline|end|.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{The `do' notation, III}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+\begin{jl}
+# turn array of int's
+# into corresponding
+# Roman numerals
+map(a) do ~\HL{num}~
+  if num == 1
+    return "I"
+  elseif num == 2
+    return "II"
+    # ...
+  end
+end # close `do` block
+\end{jl}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+      After \lstinline|do| there comes a parameter list:
+      e.g., `\lstinline|do x,y|' would substitute \texttt{x} and
+      \texttt{y} in the expression following.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\part{Type conversion}
+\begin{frame}[fragile]
+  \frametitle{Type conversion on assignment, I}
+  When assigning a value to an array item or slice, automatic
+  conversion to the element type of the array is attempted:
+\begin{lstlisting}
+~\julia~ ~\HL{v[3] = 5.0}~;  # converted to Int64
+~\julia~ v
+4-element Array{Int64,1}:
+ ~\,\,~1
+ ~\,\,~3
+ ~\HL{5}~
+ ~\,\,~7
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile]
+  \frametitle{Type conversion on assignment, II}
+  When assigning a value to an array item or slice, automatic
+  conversion to the element type of the array is \emph{attempted} ---
+  and it may fail!
+\begin{lstlisting}
+~\julia~ v[3] = 5.5
+~\ERROR{InexactError: Int64(5.5)}~
+
+~\julia~ v[3] = "five"
+~\ERROR{MethodError: Cannot `convert` an object of type String to an object of type Int64}~
+
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile]
+  \frametitle{Choosing the type of array elements, I}
+  Julia guesses the type of elements based on the initial set of items:
+\begin{lstlisting}
+~\julia~ typeof([1,2,3])
+Array{Int64,1}
+~\julia~ typeof([1.0, 2.0, 3.0])
+Array{Float64,1}
+\end{lstlisting}
+
+  \+ Arrays that can hold any value are possible, using the
+  \texttt{Any} element type:
+\begin{lstlisting}
+~\julia~ typeof([1, "two", 3.0])
+Array{Any,1}
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile]
+  \frametitle{Choosing the type of array elements, II}
+  You can convert any array to one that has a different element type,
+  like you convert any Julia value to another type, using
+  \texttt{convert} or the type constructor:
+\begin{lstlisting}
+~\julia~ b = Array{Float64,1}([1,2,3])
+3-element Array{Float64,1}:
+ 1.0
+ 2.0
+ 3.0
+
+~\julia~ c = convert(Array{Float64,1}, [1, 2, 3])
+3-element Array{Float64,1}:
+ 1.0
+ 2.0
+ 3.0
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile]
+  \frametitle{Choosing the type of array elements, III}
+
+  Still, individual elements must be convertible!
+\begin{lstlisting}
+~\julia~ convert(Array{Float64,1}, [1, "two", 3])
+~\ERROR{MethodError: Cannot `convert` an object of type String to an object of type Float64}~
+
+\end{lstlisting}
+\end{frame}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

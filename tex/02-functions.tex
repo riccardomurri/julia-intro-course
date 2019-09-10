@@ -315,6 +315,23 @@ Nothing
 \end{frame}
 
 
+\begin{frame}[fragile]
+  \frametitle{Shorthand definitions}
+  Functions whose definition fits in a single line can be created with
+  a shorthand syntax:
+\begin{semiverbatim}
+\julia \HL{F(x, y) = (a-x)\string^2 + b*(y-x\string^2)\string^2}
+F (generic function with 1 method)
+
+\julia F(-1,-1)  \lstinline|# with a=1 b=2|
+12
+\end{semiverbatim}
+
+  \+ This compact form is especially useful for mathematical functions
+  but is not limited to them.
+\end{frame}
+
+
 \part{Basic control flow}
 \begin{frame}[fragile]
   \frametitle{Conditionals}

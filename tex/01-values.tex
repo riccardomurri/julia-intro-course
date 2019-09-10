@@ -120,20 +120,37 @@ He said: "42"
 
 
 \begin{frame}[fragile]
-  \frametitle{Operators}
+  \frametitle{Operators, I}
   All the usual unary and binary arithmetic operators are
   defined in Julia: \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/},
-  \texttt{**}~(exponentiation), \texttt{<{}<}, \texttt{>{}>}, etc.
+  \texttt{\textasciicircum}~(exponentiation), \texttt{<{}<}, \texttt{>{}>}, etc.
 
-  \+ Logical operators are expressed using symbols:
+  \+ Some operators are available in Julia which are not typically
+  found in other languages: \texttt{÷} for integer division,
+  \texttt{⊻} for bitwise XOR, \ldots
+
+  \+
+  \begin{references}
+    \tiny
+    \begin{itemize}
+    \item \url{https://docs.julialang.org/en/v1/manual/mathematical-operations/}
+    \end{itemize}
+  \end{references}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Operators, II}
+  Logical operators are expressed using symbols:
   \lstinline|&&| for \emph{and},
   \lstinline:||: for \emph{or},
   \lstinline|!| for \emph{not}.
 
-  \+
-  Numerical and string comparison also follows the usual notation:
+  \+ Numerical and string comparison also follows the usual notation:
   \texttt{<}, \texttt{>}, \texttt{<=}, \texttt{==}, \texttt{!=},
-  \ldots
+  \ldots (Note that again ``pretty'' alternates are available:
+  \texttt{$\leq$} for \texttt{<=}, \texttt{$\geq$} for \texttt{=>},
+  etc.)
 
   \+
   \begin{references}

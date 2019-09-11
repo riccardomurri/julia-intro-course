@@ -54,7 +54,7 @@ or send an email to <mailto:riccardo.murri@gmail.com>
            src="http://i.creativecommons.org/l/by-nc-sa/3.0/80x15.png" />
 </a>
 <p>
-The <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Python Course</span>
+This <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Julia Course</span>
 by the <a xmlns:cc="http://creativecommons.org/ns#"
    href="http://www.s3it.uzh.ch/" property="cc:attributionName"
    rel="cc:attributionURL">University of Zurich</a> is licensed under a <a rel="license"

@@ -138,25 +138,24 @@
     \begin{column}{0.5\textwidth}
       \raggedright
 
-      \begin{describe}{\texttt{zeros(type, size)}}
-        A newly-created array filled with \texttt{0}'s.
+      \begin{describe}{\texttt{fill(x, size)}}
+        A newly-created array filled with value \texttt{x}.
 \begin{lstlisting}
-~\julia~ zeros((2,3))
-2~$\times$~3 Array{Float64,2}:
- 0.0  0.0  0.0
- 0.0  0.0  0.0
+~\julia~ fill(2, (2,3))
+2~$\times$~3 Array{Int64,2}:
+ 2  2  2
+ 2  2  2
 \end{lstlisting}
+        The element type of the array is determined by the type
+        of \texttt{x}.
       \end{describe}
 
-      \begin{describe}{\texttt{trues(size)}}
-        Same, but with boolean \texttt{true} entries.
-      \end{describe}
     \end{column}
     \begin{column}{0.5\textwidth}
       \raggedright
 
-      \begin{describe}{\texttt{ones(type, size)}}
-        A newly-created array filled with \texttt{1}'s.
+      \begin{describe}{\texttt{zeros(type, size)}, \texttt{ones(type, size)}}
+        A newly-created array filled with \texttt{0}/\texttt{1}'s.
 \begin{lstlisting}
 ~\julia~ ones(2)
 2-element Array{Float64,1}:
@@ -165,8 +164,8 @@
 \end{lstlisting}
       \end{describe}
 
-      \begin{describe}{\texttt{falses(size)}}
-        Same, but with boolean \texttt{false} entries.
+      \begin{describe}{\texttt{\texttt{trues(size)}}, \texttt{falses(size)}}
+        Same, but with boolean \texttt{true}/\texttt{false} entries.
       \end{describe}
     \end{column}
   \end{columns}
@@ -275,7 +274,7 @@
 \end{lstlisting}
 
   Slicing is possible in each dimension separately;
-  note that dimensions with just 1 index are dropped:
+  note that dimensions with singleton index are dropped:
 \begin{lstlisting}
 ~\julia~ a[:, 1:2, 1]  # 3x2(x1) slice
 3~$\times$~2 Array{Int64,2}:
@@ -605,14 +604,14 @@ c
 
   \+
   \begin{exercise*}[3.F]
-    Write a function \texttt{evens(v)} that takes a list \texttt{v} of
-    integers and returns a list of all the even ones.
+    Write a function \texttt{evens(v)} that takes a vector \texttt{v} of
+    integers and returns a vector of all the even ones.
   \end{exercise*}
 
   \+
   \begin{exercise*}[3.G]
     Write a function \texttt{deviation(v, u)} that takes a vector \texttt{v} of
-    numbers and a single value \texttt{m} returns a list with the difference of
+    numbers and a single value \texttt{m} returns a vector with the difference of
     \texttt{u} and each element \texttt{x} of \texttt{v}.
   \end{exercise*}
 \end{frame}
@@ -646,7 +645,7 @@ c
 \begin{frame}[fragile]
   \frametitle{map, reduce, filter (2)}
 
-  \begin{describe}{reduce(fn2, a)}
+  \begin{describe}{\texttt{reduce(fn2, a)}}
     Apply \emph{associative} 2-ary function \texttt{fn2(x,y)} to the
     first two items \texttt{x} and \texttt{y} of collection \texttt{a}, then
     apply \texttt{fn2} to the result and the third element of
@@ -807,6 +806,30 @@ end # close `do` block
 \end{frame}
 
 
+\begin{frame}[fragile]
+  \frametitle{The `do' notation, IV}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+\begin{jl}
+open("/path/to/file", "r") do file
+  while !eof(file);
+    line = readline(file);
+    # process line
+  end
+end\end{jl}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \raggedright
+
+      \+\+\+\+
+      `\texttt{do}' blocks are not just for use with \texttt{map}.
+
+      \+ Wherever a function is the first argument, `\texttt{do}' is a fit.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
 \part{Type conversion}
 \begin{frame}[fragile]
   \frametitle{Type conversion on assignment, I}
@@ -861,16 +884,17 @@ Array{Any,1}
 
 \begin{frame}[fragile,fragile]
   \frametitle{Choosing the type of array elements, II}
-  You can convert any array to one that has a different element type,
-  like you convert any Julia value to another type, using
-  \texttt{convert} or the type constructor:
+  You can override Julia's decision for element type, by specifying it before the `\texttt{[}':
 \begin{lstlisting}
-~\julia~ b = Array{Float64,1}([1,2,3])
+~\julia~ b = Float64[1,2,3]
 3-element Array{Float64,1}:
  1.0
  2.0
  3.0
+\end{lstlisting}
 
+  Or you can convert afterwards:
+\begin{lstlisting}
 ~\julia~ c = convert(Array{Float64,1}, [1, 2, 3])
 3-element Array{Float64,1}:
  1.0

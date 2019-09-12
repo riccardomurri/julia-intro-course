@@ -52,14 +52,32 @@
 "x=42"
 \julia log10(1e42)
 42.0
-\julia √(1764)  # {\textbackslash}sqrt + TAB
+\julia √(1764)  \lstinline|# \sqrt + TAB|
 42.0
 \end{semiverbatim}
 \end{frame}
 
 
-\begin{frame}[fragile,fragile]
+\begin{frame}[fragile]
   \frametitle{Functions, II}
+  The `\texttt{|>}' operator allows an alternate syntax for function calls:
+\begin{semiverbatim}
+\julia 42 |> string
+"42"
+\end{semiverbatim}
+
+  \+ This makes chained function calls more readable; compare:
+\begin{semiverbatim}
+\julia 42 |> string |> typeof
+String
+\julia typeof(string(42))
+String
+\end{semiverbatim}
+\end{frame}
+
+
+\begin{frame}[fragile,fragile]
+  \frametitle{Functions, III}
   Some functions can take a variable number of arguments. For instance:
 
   \+
@@ -317,7 +335,7 @@ Nothing
 
 \begin{frame}[fragile]
   \frametitle{Shorthand definitions}
-  Functions whose definition fits in a single line can be created with
+  Functions whose definition fits in a single expression can be created with
   a shorthand syntax:
 \begin{semiverbatim}
 \julia \HL{F(x, y) = (a-x)\string^2 + b*(y-x\string^2)\string^2}
@@ -400,7 +418,7 @@ It's false!
   \+ Integers, strings, or other types cannot be used \\ in \texttt{if}'s
   test expression:
 \begin{semiverbatim}
-\julia \textbf{if} 1  # Python would allow this!
+\julia \textbf{if} 1  \lstinline|# Python would allow this!|
     println("A truism.")
   \textbf{else}
     print("It's false!!")
